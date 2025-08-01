@@ -127,18 +127,6 @@ const addBranches = () => {
 onMounted(async () => {
     if (nodeData.newNode) {
         nodeData.nodeName += node.getData().nodeCnt.toString();
-        const heightOffset = nodeName.value.offsetHeight + 60;
-        const x = nodeName.value.offsetWidth - 15;
-        node.addPort({
-            group: 'absolute',
-            args: { x: x, y: heightOffset },
-            attrs: {
-                text: {
-                    text: t('cronJobNode.nextStep'),
-                    fontSize: 12,
-                },
-            },
-        });
         nodeData.newNode = false;
     }
     //     let t = await httpReq('GET', 'variable', { robotId: robotId }, null, null);
@@ -300,9 +288,6 @@ const changeTab = (v) => {
                         <template #prepend>{{ nodeData.method }} {{ nodeData.protocol }}</template>
                     </el-input>
                 </el-form-item>
-            </el-form>
-            <el-text tag="b" size="large">Advanced</el-text>
-            <el-form :model="nodeData" label-width="90px">
                 <el-form-item label="Parameters">
                     <el-tabs v-model="activeName" class="demo-tabs" @tab-click="handleClick">
                         <el-tab-pane label="Header" name="h">
@@ -383,8 +368,9 @@ const changeTab = (v) => {
                 </el-form-item>
                 <el-form-item label="Sync/Async" :label-width="formLabelWidth">
                     <!-- <el-switch v-model="httpApiData.asyncReq" class="mb-2" active-text="Asynchronous" inactive-text="Synchronous" /> -->
-                    <input type="checkbox" id="_asyncReq_" v-model="nodeData.asyncReq"
-                        :checked="nodeData.asyncReq" /><label for="_asyncReq_">Asynchronous</label>
+                    <!-- <input type="checkbox" id="_asyncReq_" v-model="nodeData.asyncReq"
+                        :checked="nodeData.asyncReq" /><label for="_asyncReq_">Asynchronous</label> -->
+                    <el-checkbox v-model="nodeData.asyncReq" label="Asynchronous" />
                 </el-form-item>
                 <el-form-item label="Timeout" :label-width="formLabelWidth">
                     <el-input-number v-model="nodeData.timeoutMilliseconds" :min="200" :max="600000" />
