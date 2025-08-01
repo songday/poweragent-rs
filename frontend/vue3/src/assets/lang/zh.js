@@ -22,6 +22,8 @@ export default {
         type: '类型',
         sec: ' 秒',
         millis: ' 毫秒',
+        successful: '成功',
+        failed: '失败',
     },
     cronJobNode: {
         nodeName: '定时触发器节点',

@@ -97,7 +97,7 @@ const addBranches = () => {
             args: { x: nodeName.value.offsetWidth - 15, y: nodeName.value.offsetHeight + 40 },
             attrs: {
                 text: {
-                    text: 'Successful',
+                    text: t('common.successful'),
                     fontSize: 12,
                 },
             },
@@ -107,7 +107,7 @@ const addBranches = () => {
             args: { x: nodeName.value.offsetWidth - 15, y: nodeName.value.offsetHeight + 56 },
             attrs: {
                 text: {
-                    text: 'Failed',
+                    text: t('common.failed'),
                     fontSize: 12,
                 },
             },
@@ -195,6 +195,14 @@ const editParam = (idx) => {
         copyProperties(nodeData.formData[idx], param)
     paramSetFormVisible.value = true
 }
+const delParam = (idx) => {
+    if (activeName.value == 'h')
+        nodeData.headers[idx].splice(idx, 1)
+    else if (activeName.value == 'q')
+        nodeData.queryParams[idx].splice(idx, 1)
+    else if (activeName.value == 'f')
+        nodeData.formData[idx].splice(idx, 1)
+}
 const save = async () => {
     nodeData.protocol = nodeData.protocol.replace('://', '').toUpperCase();
     const t = await httpReq('POST', 'external/http/' + apiId, { robotId: robotId }, null, nodeData);
@@ -223,9 +231,6 @@ const insertVar = () => {
     nodeData.requestBody += '`' + selectedVar.value + '`'
     // console.log(requestBodyRef.requestBody)
     varDialogVisible.value = false
-}
-const goBack = () => {
-    router.push({ name: 'externalHttpApis', params: { robotId: robotId } });
 }
 const handleClick = (tab, event) => {
     // dynamicTitle.value = 'Add ' + tab.paneLabel + ' parameter';
@@ -310,7 +315,7 @@ const changeTab = (v) => {
                                             Edit
                                         </el-button> |
                                         <el-button link type="primary" size="small"
-                                            @click="delApi(scope.$index, scope.row)">
+                                            @click="delParam(scope.$index, scope.row)">
                                             Delete
                                         </el-button>
                                     </template>
@@ -328,7 +333,7 @@ const changeTab = (v) => {
                                             Edit
                                         </el-button> |
                                         <el-button link type="primary" size="small"
-                                            @click="delApi(scope.$index, scope.row)">
+                                            @click="delParam(scope.$index, scope.row)">
                                             Delete
                                         </el-button>
                                     </template>
@@ -353,7 +358,7 @@ const changeTab = (v) => {
                                             Edit
                                         </el-button> |
                                         <el-button link type="primary" size="small"
-                                            @click="delApi(scope.$index, scope.row)">
+                                            @click="delParam(scope.$index, scope.row)">
                                             Delete
                                         </el-button>
                                     </template>

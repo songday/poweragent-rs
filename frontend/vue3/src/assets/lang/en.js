@@ -21,6 +21,8 @@ export default {
         type: 'Type',
         sec: 'seconds',
         millis: 'milliseconds',
+        successful: 'Successful',
+        failed: 'Failed',
     },
     cronJobNode: {
         nodeName: 'Cron job node',
