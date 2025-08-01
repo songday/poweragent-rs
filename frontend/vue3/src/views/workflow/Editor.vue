@@ -1,5 +1,8 @@
 <script setup>
 import { h, ref, onMounted, onUnmounted, nextTick, provide, readonly } from "vue";
+import MaterialSymbolsLightArrowCircleLeftRounded from '~icons/material-symbols-light/arrow-circle-left-rounded'
+import MaterialSymbolsLightSaveRounded from '~icons/material-symbols-light/save-rounded'
+import MaterialSymbolsLightTravelRounded from '~icons/material-symbols-light/travel-rounded'
 import CronJobNode from "@/components/workflow/nodes/CronJobNode.vue";
 import HttpReqNode from "@/components/workflow/nodes/HttpReqNode.vue";
 import { Graph } from '@antv/x6';
@@ -165,7 +168,7 @@ function addHandleNode(x, y, item) {
         shape: item.type,
         x: x,
         y: y,
-        connectable: false,
+        connectable: item.connectable,
         // tools: ["button-remove"],
     });
     item.cnt++;
@@ -184,15 +187,15 @@ function dragoverDiv(ev) {
 const TeleportContainer = getTeleport();
 
 const nodes = [
-    { name: 'CronJobNode', type: 'CronJobNode', desc: 'Cron job node', cnt: 1 },
-    { name: 'HttpReqNode', type: 'HttpReqNode', desc: 'Http request node', cnt: 1 },
+    { name: 'CronJobNode', type: 'CronJobNode', desc: 'Cron job node', cnt: 0, connectable: false },
+    { name: 'HttpReqNode', type: 'HttpReqNode', desc: 'Http request node', cnt: 0, connectable: true },
 ]
 </script>
 
 <style scoped>
 #canvas {
     width: 100vw;
-    height: calc(100vh - 43px);
+    height: 100vh;
 }
 
 .nodesBox {
@@ -202,18 +205,18 @@ const nodes = [
     top: 20px;
     left: 20px;
     z-index: 100;
-    width: 100px;
+    width: 150px;
     font-size: 9pt;
 }
 
 .node-btn {
     cursor: pointer;
     border: 1px solid #dad9d9;
-    padding: 10px;
-    margin-bottom: 6px;
+    padding: 8px;
+    margin-top: 6px;
     font-size: 9pt;
     /* width: v-bind(nodesBtnWidth); */
-    width: 100px;
+    width: 140px;
     background-color: white;
 }
 
@@ -228,6 +231,23 @@ const nodes = [
 
 <template>
     <div class="nodesBox">
+        <el-button-group class="ml-4">
+            <el-button type="primary">
+                <el-icon size="large">
+                    <MaterialSymbolsLightArrowCircleLeftRounded />
+                </el-icon>
+            </el-button>
+            <el-button type="primary">
+                <el-icon size="large">
+                    <MaterialSymbolsLightSaveRounded />
+                </el-icon>
+            </el-button>
+            <el-button type="primary">
+                <el-icon size="large">
+                    <MaterialSymbolsLightTravelRounded />
+                </el-icon>
+            </el-button>
+        </el-button-group>
         <div v-for="item in nodes" :key="item.type" class="node-btn" :class="item.type" draggable="true"
             @dragend="handleDragEnd($event, item)">
             <el-tooltip class="box-item" effect="dark" :content="item.desc" placement="right-start">
@@ -235,6 +255,6 @@ const nodes = [
             </el-tooltip>
         </div>
     </div>
-    <div id="canvas" @dragover="dragoverDiv" style="border: 1px #000 solid;"></div>
+    <div id="canvas" @dragover="dragoverDiv"></div>
     <TeleportContainer />
 </template>

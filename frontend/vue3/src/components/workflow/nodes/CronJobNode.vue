@@ -1,41 +1,84 @@
 <script setup>
 import { inject, ref, reactive, onMounted } from 'vue';
+import { copyProperties } from '@/assets/tools'
+import { useI18n } from 'vue-i18n'
 const getNode = inject('getNode');
+const { t, tm, rt } = useI18n();
 const node = getNode();
+node.on("change:data", ({ current }) => {
+    nodeSetFormVisible.value = true;
+});
+const info = ref('')
 const nodeName = ref();
+const nodeSetFormVisible = ref(false)
 
 onMounted(() => {
     if (nodeData.newNode) {
         nodeData.nodeName += node.getData().nodeCnt.toString();
-        const heightOffset = nodeName.value.offsetHeight + 50;
+        nodeData.timezoneOffsetMinutes = 0 - (new Date()).getTimezoneOffset();
+        const heightOffset = nodeName.value.offsetHeight + 60;
         const x = nodeName.value.offsetWidth - 15;
         node.addPort({
             group: 'absolute',
             args: { x: x, y: heightOffset },
             attrs: {
                 text: {
-                    text: 'Next',
+                    text: t('cronJobNode.nextStep'),
                     fontSize: 12,
                 },
             },
         });
         nodeData.newNode = false;
     }
-    // copyProperties(node.getData(), nodeData);
+    copyProperties(node.getData(), nodeData);
+    setInfo();
+    validate();
 })
 
 const nodeData = reactive({
-    nodeName: 'Cron job node',
-    sec: '',
-    min: '',
-    hour: '',
-    dayOfMonth: '',
-    month: '',
-    dayOfWeek: '',
+    nodeName: t('cronJobNode.nodeName'),
+    sec: '*',
+    min: '*',
+    hour: '*',
+    dayOfMonth: '*',
+    month: '*',
+    dayOfWeek: '*',
+    timezoneOffsetMinutes: 0,
     valid: false,
     invalidMessages: [],
     newNode: true,
 })
+
+const setInfo = () => {
+    let a = [];
+    a.push(t('cronJobNode.settings.sec') + ': ' + nodeData.sec);
+    a.push(t('cronJobNode.settings.min') + ': ' + nodeData.min);
+    a.push(t('cronJobNode.settings.hour') + ': ' + nodeData.hour);
+    a.push(t('cronJobNode.settings.dayOfMonth') + ': ' + nodeData.dayOfMonth);
+    a.push(t('cronJobNode.settings.month') + ': ' + nodeData.month);
+    a.push(t('cronJobNode.settings.dayOfWeek') + ': ' + nodeData.dayOfWeek);
+    a.push(t('cronJobNode.settings.timezoneOffsetMinutes') + ': UTC' + (nodeData.timezoneOffsetMinutes >= 0 ? '+' : '') + nodeData.timezoneOffsetMinutes);
+    info.value = a.join(', ')
+}
+
+const validate = () => {
+    nodeData.invalidMessages = [];
+    if (nodeData.nodeName == '') {
+        nodeData.invalidMessages.push(t('cronJobNode.errors.nodeName'));
+    }
+    if (nodeData.sec == '' && nodeData.min == '' && nodeData.hour == '' && nodeData.dayOfMonth == '' && nodeData.month == '' && nodeData.dayOfWeek == '') {
+        nodeData.invalidMessages.push(t('cronJobNode.errors.cron'));
+    }
+    nodeData.valid = nodeData.invalidMessages.length == 0;
+}
+
+const saveForm = () => {
+    hideForm();
+    setInfo();
+    validate();
+}
+
+const hideForm = () => { nodeSetFormVisible.value = false }
 </script>
 <style scoped>
 .nodeBox {
@@ -67,20 +110,47 @@ const nodeData = reactive({
                 </el-tooltip>
             </span>
         </div>
+        <div>{{ info }}</div>
         <!-- <teleport to="body"> -->
         <el-drawer v-model="nodeSetFormVisible" :title="nodeData.nodeName" direction="rtl" size="50%"
             :append-to-body="true" :destroy-on-close="true">
-            Sec Min Hour DayOfMonth Month DayOfWeek
             <el-form :label-position="labelPosition" label-width="100px" :model="nodeData">
                 <el-form-item :label="t('common.nodeName')" :label-width="formLabelWidth">
                     <el-input v-model="nodeData.nodeName" />
                 </el-form-item>
-                <el-form-item label="Ending text" :label-width="formLabelWidth">
-                    <el-input v-model="nodeData.endingText" type="textarea" />
+            </el-form>
+            <el-form :label-position="labelPosition" label-width="100px" :model="nodeData">
+                <el-form-item :label="t('cronJobNode.settings.sec')" :label-width="formLabelWidth">
+                    <el-input v-model="nodeData.sec" />
+                </el-form-item>
+            </el-form>
+            <el-form :label-position="labelPosition" label-width="100px" :model="nodeData">
+                <el-form-item :label="t('cronJobNode.settings.min')" :label-width="formLabelWidth">
+                    <el-input v-model="nodeData.min" />
+                </el-form-item>
+            </el-form>
+            <el-form :label-position="labelPosition" label-width="100px" :model="nodeData">
+                <el-form-item :label="t('cronJobNode.settings.hour')" :label-width="formLabelWidth">
+                    <el-input v-model="nodeData.hour" />
+                </el-form-item>
+            </el-form>
+            <el-form :label-position="labelPosition" label-width="100px" :model="nodeData">
+                <el-form-item :label="t('cronJobNode.settings.dayOfMonth')" :label-width="formLabelWidth">
+                    <el-input v-model="nodeData.dayOfMonth" />
+                </el-form-item>
+            </el-form>
+            <el-form :label-position="labelPosition" label-width="100px" :model="nodeData">
+                <el-form-item :label="t('cronJobNode.settings.month')" :label-width="formLabelWidth">
+                    <el-input v-model="nodeData.month" />
+                </el-form-item>
+            </el-form>
+            <el-form :label-position="labelPosition" label-width="100px" :model="nodeData">
+                <el-form-item :label="t('cronJobNode.settings.dayOfWeek')" :label-width="formLabelWidth">
+                    <el-input v-model="nodeData.dayOfWeek" />
                 </el-form-item>
             </el-form>
             <div class="demo-drawer__footer">
-                <el-button type="primary" :loading="loading" @click="saveForm()">{{ t('.common.save') }}</el-button>
+                <el-button type="primary" :loading="loading" @click="saveForm()">{{ t('common.save') }}</el-button>
                 <el-button @click="hideForm()">{{ t('common.cancel') }}</el-button>
             </div>
         </el-drawer>
