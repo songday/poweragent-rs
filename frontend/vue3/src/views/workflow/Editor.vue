@@ -12,7 +12,7 @@ import { register, getTeleport } from "@antv/x6-vue-shape";
 register({
     shape: "CronJobNode",
     width: 270,
-    height: 120,
+    height: 110,
     component: CronJobNode,
     ports: {
         groups: {
@@ -187,8 +187,8 @@ function dragoverDiv(ev) {
 const TeleportContainer = getTeleport();
 
 const nodes = [
-    { name: 'CronJobNode', type: 'CronJobNode', desc: 'Cron job node', cnt: 0, connectable: false },
-    { name: 'HttpReqNode', type: 'HttpReqNode', desc: 'Http request node', cnt: 0, connectable: true },
+    { name: 'Cron job node', type: 'CronJobNode', desc: 'Cron job node', cnt: 0, connectable: false },
+    { name: 'Http request node', type: 'HttpReqNode', desc: 'Http request node', cnt: 0, connectable: true },
 ]
 </script>
 

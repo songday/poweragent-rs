@@ -1,5 +1,6 @@
 <script setup>
 import { inject, ref, reactive, onMounted } from 'vue';
+import EpWarning from '~icons/ep/warning'
 import { copyProperties } from '@/assets/tools'
 import { useI18n } from 'vue-i18n'
 const getNode = inject('getNode');
@@ -8,6 +9,7 @@ const node = getNode();
 node.on("change:data", ({ current }) => {
     nodeSetFormVisible.value = true;
 });
+const formLabelWidth = '100px'
 const info = ref('')
 const nodeName = ref();
 const nodeSetFormVisible = ref(false)
@@ -83,7 +85,7 @@ const hideForm = () => { nodeSetFormVisible.value = false }
 <style scoped>
 .nodeBox {
     border: 2px #0000000e solid;
-    height: 120px;
+    height: 110px;
     width: 100%;
     background-color: white;
     font-size: 12px;
@@ -114,43 +116,43 @@ const hideForm = () => { nodeSetFormVisible.value = false }
         <!-- <teleport to="body"> -->
         <el-drawer v-model="nodeSetFormVisible" :title="nodeData.nodeName" direction="rtl" size="50%"
             :append-to-body="true" :destroy-on-close="true">
-            <el-form :label-position="labelPosition" label-width="100px" :model="nodeData">
+            <el-form label-width="100px" :model="nodeData">
                 <el-form-item :label="t('common.nodeName')" :label-width="formLabelWidth">
                     <el-input v-model="nodeData.nodeName" />
                 </el-form-item>
             </el-form>
-            <el-form :label-position="labelPosition" label-width="100px" :model="nodeData">
+            <el-form label-width="100px" :model="nodeData">
                 <el-form-item :label="t('cronJobNode.settings.sec')" :label-width="formLabelWidth">
                     <el-input v-model="nodeData.sec" />
                 </el-form-item>
             </el-form>
-            <el-form :label-position="labelPosition" label-width="100px" :model="nodeData">
+            <el-form label-width="100px" :model="nodeData">
                 <el-form-item :label="t('cronJobNode.settings.min')" :label-width="formLabelWidth">
                     <el-input v-model="nodeData.min" />
                 </el-form-item>
             </el-form>
-            <el-form :label-position="labelPosition" label-width="100px" :model="nodeData">
+            <el-form label-width="100px" :model="nodeData">
                 <el-form-item :label="t('cronJobNode.settings.hour')" :label-width="formLabelWidth">
                     <el-input v-model="nodeData.hour" />
                 </el-form-item>
             </el-form>
-            <el-form :label-position="labelPosition" label-width="100px" :model="nodeData">
+            <el-form label-width="100px" :model="nodeData">
                 <el-form-item :label="t('cronJobNode.settings.dayOfMonth')" :label-width="formLabelWidth">
                     <el-input v-model="nodeData.dayOfMonth" />
                 </el-form-item>
             </el-form>
-            <el-form :label-position="labelPosition" label-width="100px" :model="nodeData">
+            <el-form label-width="100px" :model="nodeData">
                 <el-form-item :label="t('cronJobNode.settings.month')" :label-width="formLabelWidth">
                     <el-input v-model="nodeData.month" />
                 </el-form-item>
             </el-form>
-            <el-form :label-position="labelPosition" label-width="100px" :model="nodeData">
+            <el-form label-width="100px" :model="nodeData">
                 <el-form-item :label="t('cronJobNode.settings.dayOfWeek')" :label-width="formLabelWidth">
                     <el-input v-model="nodeData.dayOfWeek" />
                 </el-form-item>
             </el-form>
             <div class="demo-drawer__footer">
-                <el-button type="primary" :loading="loading" @click="saveForm()">{{ t('common.save') }}</el-button>
+                <el-button type="primary" @click="saveForm()">{{ t('common.save') }}</el-button>
                 <el-button @click="hideForm()">{{ t('common.cancel') }}</el-button>
             </div>
         </el-drawer>
