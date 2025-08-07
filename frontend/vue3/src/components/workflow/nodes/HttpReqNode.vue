@@ -29,6 +29,7 @@ const nodeData = reactive({
     userAgent: 'Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:109.0) Gecko/20100101 Firefox/123.0',
     asyncReq: false,
     branches: [],
+    resultVarName: 'httpResponse',
     valid: false,
     invalidMessages: [],
     newNode: true,

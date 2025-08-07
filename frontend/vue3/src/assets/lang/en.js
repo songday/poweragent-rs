@@ -38,13 +38,16 @@ export default {
         nextStep: 'Next step',
         errors: ['Node name not filled in', 'Text not filled in', 'Text was too long'],
     },
-    httpReqNode:{
-        nodeName:'HTTP request node',
-        desc:'Description',
-        dynamicTitle:{
-            h:'Add header',
-            q:'Add query parameter',
-            f:'Add POST parameter',
+    httpReqNode: {
+        nodeName: 'HTTP request node',
+        desc: 'Description',
+        dynamicTitle: {
+            h: 'Add header',
+            q: 'Add query parameter',
+            f: 'Add POST parameter',
         }
+    },
+    llmNode: {
+        nodeName: 'LLM node',
     },
 }

@@ -39,13 +39,16 @@ export default {
         nextStep: '下一步',
         errors: ['节点名称不能为空', '表达式不能为空', '表达式长度不能超过255'],
     },
-    httpReqNode:{
-        nodeName:'HTTP 请求节点',
-        desc:'描述',
-        dynamicTitle:{
-            h:'增加请求头',
-            q:'增加请求参数',
-            f:'增加提交参数',
+    httpReqNode: {
+        nodeName: 'HTTP 请求节点',
+        desc: '描述',
+        dynamicTitle: {
+            h: '增加请求头',
+            q: '增加请求参数',
+            f: '增加提交参数',
         }
+    },
+    llmNode: {
+        nodeName: '大模型节点',
     },
 }

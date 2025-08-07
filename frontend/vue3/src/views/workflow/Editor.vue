@@ -1,10 +1,12 @@
 <script setup>
 import { h, ref, onMounted, onUnmounted, nextTick, provide, readonly } from "vue";
-import MaterialSymbolsLightArrowCircleLeftRounded from '~icons/material-symbols-light/arrow-circle-left-rounded'
-import MaterialSymbolsLightSaveRounded from '~icons/material-symbols-light/save-rounded'
-import MaterialSymbolsLightTravelRounded from '~icons/material-symbols-light/travel-rounded'
+import BiArrowLeft from '~icons/bi/arrow-left'
+import BiFloppy from '~icons/bi/floppy'
+import BiClipboard2Check from '~icons/bi/clipboard2-check'
+import BiSend from '~icons/bi/send'
 import CronJobNode from "@/components/workflow/nodes/CronJobNode.vue";
 import HttpReqNode from "@/components/workflow/nodes/HttpReqNode.vue";
+import LlmNode from "@/components/workflow/nodes/LlmNode.vue";
 import { Graph } from '@antv/x6';
 // https://x6.antv.vision/zh/docs/tutorial/advanced/react#%E6%B8%B2%E6%9F%93-vue-%E8%8A%82%E7%82%B9
 import { register, getTeleport } from "@antv/x6-vue-shape";
@@ -45,6 +47,37 @@ register({
     width: 270,
     height: 120,
     component: HttpReqNode,
+    ports: {
+        groups: {
+            absolute: {
+                position: {
+                    name: 'absolute',
+                },
+                attrs: {
+                    circle: {
+                        r: 5,
+                        magnet: true,
+                        stroke: 'black',
+                        strokeWidth: 1,
+                        fill: '#fff',
+                        style: {
+                            visibility: 'show',
+                        },
+                    },
+                },
+                label: {
+                    position: 'left',
+                }
+            },
+        },
+    }
+});
+
+register({
+    shape: "LlmNode",
+    width: 270,
+    height: 120,
+    component: LlmNode,
     ports: {
         groups: {
             absolute: {
@@ -189,6 +222,7 @@ const TeleportContainer = getTeleport();
 const nodes = [
     { name: 'Cron job node', type: 'CronJobNode', desc: 'Cron job node', cnt: 0, connectable: false },
     { name: 'Http request node', type: 'HttpReqNode', desc: 'Http request node', cnt: 0, connectable: true },
+    { name: 'LLM node', type: 'LlmNode', desc: 'LLM node', cnt: 0, connectable: true },
 ]
 </script>
 
@@ -205,7 +239,7 @@ const nodes = [
     top: 20px;
     left: 20px;
     z-index: 100;
-    width: 150px;
+    width: 170px;
     font-size: 9pt;
 }
 
@@ -220,34 +254,43 @@ const nodes = [
     background-color: white;
 }
 
+.CronJobNode {
+    border-left: 5px solid #EFB7BA;
+}
+
 .HttpReqNode {
     border-left: 5px solid rgb(255, 196, 0);
 }
 
-.CronJobNode {
-    border-left: 5px solid #EFB7BA;
+.LlmNode {
+    border-left: 5px solid rgb(145, 113, 227);
 }
 </style>
 
 <template>
     <div class="nodesBox">
-        <el-button-group class="ml-4">
-            <el-button type="primary">
+        <div>
+            <el-button circle>
                 <el-icon size="large">
-                    <MaterialSymbolsLightArrowCircleLeftRounded />
+                    <BiArrowLeft />
                 </el-icon>
             </el-button>
-            <el-button type="primary">
+            <el-button circle>
                 <el-icon size="large">
-                    <MaterialSymbolsLightSaveRounded />
+                    <BiFloppy />
                 </el-icon>
             </el-button>
-            <el-button type="primary">
+            <el-button circle>
                 <el-icon size="large">
-                    <MaterialSymbolsLightTravelRounded />
+                    <BiClipboard2Check />
                 </el-icon>
             </el-button>
-        </el-button-group>
+            <el-button circle>
+                <el-icon size="large">
+                    <BiSend />
+                </el-icon>
+            </el-button>
+        </div>
         <div v-for="item in nodes" :key="item.type" class="node-btn" :class="item.type" draggable="true"
             @dragend="handleDragEnd($event, item)">
             <el-tooltip class="box-item" effect="dark" :content="item.desc" placement="right-start">
