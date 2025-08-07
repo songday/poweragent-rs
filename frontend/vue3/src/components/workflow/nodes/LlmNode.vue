@@ -18,6 +18,7 @@ const nodeData = reactive({
     valid: false,
     invalidMessages: [],
     branches: [],
+    asyncReq: false,
     resultVarName: 'llmResponse',
     newNode: true,
 });
@@ -52,7 +53,7 @@ const allModels = {
             models: [{
                 modelId: 'GPT-4.1',
                 modelName: 'GPT-4.1',
-            },{
+            }, {
                 modelId: 'GPT-4o',
                 modelName: 'GPT-4o',
             }]
@@ -267,18 +268,27 @@ const hideForm = () => {
                             :value="item.modelId" />
                     </el-select>
                 </el-form-item>
-                <el-form-item v-show="nodeData.modelCategory === 'Ollama'" label="API URL" :label-width="formLabelWidth">
+                <el-form-item v-show="nodeData.modelCategory === 'Ollama'" label="API URL"
+                    :label-width="formLabelWidth">
                     <el-input v-model="nodeData.ollamaApiUrl" />
                 </el-form-item>
-                <el-form-item v-show="nodeData.modelCategory === 'LlmApis'" label="API Key" :label-width="formLabelWidth">
+                <el-form-item v-show="nodeData.modelCategory === 'LlmApis'" label="API Key"
+                    :label-width="formLabelWidth">
                     <el-input v-model="nodeData.apiKey" />
                 </el-form-item>
                 <el-form-item label="Context length" :label-width="formLabelWidth">
                     <el-input-number v-model="nodeData.contextLength" :min="0" :max="50" :step="5" />
                     How many chat history records will be added.
                 </el-form-item>
-                <el-form-item  v-show="nodeData.modelCategory !== 'HuggingFace'" label="Timeout" :label-width="formLabelWidth">
+                <el-form-item label="Sync/Async" :label-width="formLabelWidth">
+                    <el-checkbox v-model="nodeData.asyncReq" label="Asynchronous" />
+                </el-form-item>
+                <el-form-item v-show="nodeData.modelCategory !== 'HuggingFace'" label="Timeout"
+                    :label-width="formLabelWidth">
                     <el-input-number v-model="nodeData.timeoutMillis" :min="100" :max="65500" />
+                </el-form-item>
+                <el-form-item v-show="!nodeData.asyncReq" label="Save response to" :label-width="formLabelWidth">
+                    <el-input v-model="nodeData.resultVarName" autocomplete="on" placeholder="Enter a variable name" />
                 </el-form-item>
             </el-form>
             <div>

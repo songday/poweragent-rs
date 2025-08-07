@@ -377,6 +377,9 @@ const changeTab = (v) => {
                     <el-input-number v-model="nodeData.timeoutMilliseconds" :min="200" :max="600000" />
                     {{ $t('common.millis') }}
                 </el-form-item>
+                <el-form-item v-show="!nodeData.asyncReq" label="Save response to" :label-width="formLabelWidth">
+                    <el-input v-model="nodeData.resultVarName" autocomplete="on" placeholder="Enter a variable name" />
+                </el-form-item>
                 <el-form-item>
                     <el-button type="primary" @click="saveForm">{{ $t('common.save') }}</el-button>
                     <el-button @click="hideForm">{{ $t('common.cancel') }}</el-button>
