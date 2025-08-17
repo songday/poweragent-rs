@@ -4,11 +4,17 @@ version = "0.1.0"
 edition = "2024"
 
 [dependencies]
-axum = "0.8.4"
+axum = {version = "0.8.4", features = ["query", "tokio", "macros", "multipart"]}
+chrono = "0.4.41"
 colored = "3.0.0"
+env_logger = "0.11.8"
 futures = "0.3.31"
-rkyv = "0.8.11"
-serde = "1.0.219"
+log = "0.4.27"
+redb = "3.0.0"
+reqwest = { version = "0.12.22", default-features = false, features = ["native-tls", "stream"] }
+rkyv = {version = "0.8.10", features = ["aligned", "alloc", "bytecheck"]}
+serde = { version = "1.0.219", features = ["derive"] }
 serde_json = "1.0.142"
-tokio = "1.47.1"
-tower-http = "0.6.6"
+tokio = { version = "1.46.1", features = ["fs", "io-util", "macros", "net", "rt", "rt-multi-thread", "signal", "time"] }
+tower-http = { version = "0.6.6", features = ["cors", "limit"] }
+windows = "0.61.3"

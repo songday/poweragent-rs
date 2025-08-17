@@ -46,7 +46,7 @@ const nodeData = reactive({
     month: '*',
     dayOfWeek: '*',
     timezoneOffsetMinutes: 0,
-    valid: false,
+    outputTriggerTimeVarName: 'TriggerTime',
     invalidMessages: [],
     newNode: true,
 })
@@ -120,35 +120,28 @@ const hideForm = () => { nodeSetFormVisible.value = false }
                 <el-form-item :label="t('common.nodeName')" :label-width="formLabelWidth">
                     <el-input v-model="nodeData.nodeName" />
                 </el-form-item>
-            </el-form>
-            <el-form label-width="100px" :model="nodeData">
                 <el-form-item :label="t('cronJobNode.settings.sec')" :label-width="formLabelWidth">
                     <el-input v-model="nodeData.sec" />
                 </el-form-item>
-            </el-form>
-            <el-form label-width="100px" :model="nodeData">
                 <el-form-item :label="t('cronJobNode.settings.min')" :label-width="formLabelWidth">
                     <el-input v-model="nodeData.min" />
                 </el-form-item>
-            </el-form>
-            <el-form label-width="100px" :model="nodeData">
                 <el-form-item :label="t('cronJobNode.settings.hour')" :label-width="formLabelWidth">
                     <el-input v-model="nodeData.hour" />
                 </el-form-item>
-            </el-form>
-            <el-form label-width="100px" :model="nodeData">
                 <el-form-item :label="t('cronJobNode.settings.dayOfMonth')" :label-width="formLabelWidth">
                     <el-input v-model="nodeData.dayOfMonth" />
                 </el-form-item>
-            </el-form>
-            <el-form label-width="100px" :model="nodeData">
                 <el-form-item :label="t('cronJobNode.settings.month')" :label-width="formLabelWidth">
                     <el-input v-model="nodeData.month" />
                 </el-form-item>
-            </el-form>
-            <el-form label-width="100px" :model="nodeData">
                 <el-form-item :label="t('cronJobNode.settings.dayOfWeek')" :label-width="formLabelWidth">
                     <el-input v-model="nodeData.dayOfWeek" />
+                </el-form-item>
+                <el-form-item :label="t('cronJobNode.settings.output')" :label-width="formLabelWidth">
+                </el-form-item>
+                <el-form-item :label="t('cronJobNode.settings.outputTriggerTimeVarName')" :label-width="formLabelWidth">
+                    <el-input v-model="nodeData.outputTriggerTimeVarName" />
                 </el-form-item>
             </el-form>
             <div class="demo-drawer__footer">

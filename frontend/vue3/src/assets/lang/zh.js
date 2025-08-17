@@ -35,6 +35,8 @@ export default {
             month: '月份',
             dayOfWeek: '星期',
             timezoneOffsetMinutes: '时区',
+            output: '输出',
+            outputTriggerTimeVarName: '触发时间',
         },
         nextStep: '下一步',
         errors: ['节点名称不能为空', '表达式不能为空', '表达式长度不能超过255'],

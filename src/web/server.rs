@@ -14,17 +14,7 @@ use tower_http::cors::{AllowOrigin, CorsLayer};
 use tower_http::limit::RequestBodyLimitLayer;
 
 use super::asset::ASSETS_MAP;
-use crate::ai::crud as ai;
-use crate::external::http::crud as http;
-use crate::flow::mainflow::crud as mainflow;
-use crate::flow::rt::facade as rt;
-use crate::flow::subflow::crud as subflow;
-use crate::intent::crud as intent;
-use crate::kb::crud as kb;
-use crate::man::settings;
-use crate::result::Error;
-use crate::robot::crud as robot;
-use crate::variable::crud as variable;
+use crate::workflow::editor as workflow;
 
 //https://stackoverflow.com/questions/27840394/how-can-a-rust-program-access-metadata-from-its-cargo-package
 pub(crate) const VERSION: &str = env!("CARGO_PKG_VERSION");
@@ -60,24 +50,6 @@ fn get_lang() -> String {
 // }
 
 pub async fn start_app() {
-    // unsafe {
-    //     libsqlite3_sys::sqlite3_auto_extension(Some(std::mem::transmute(
-    //         sqlite_vec::sqlite3_vec_init as *const (),
-    //     )));
-    // }
-
-    crate::intent::phrase::init_datasource()
-        .await
-        .expect("Failed initialize intent phrase vector database.");
-
-    crate::kb::qa::init_datasource()
-        .await
-        .expect("Failed initialize knowledge base QnA vector database.");
-
-    crate::kb::doc::init_datasource()
-        .await
-        .expect("Failed initialize knowledge base QnA vector database.");
-
     let settings = {
         let mut s = crate::db::init().await.expect("Initialize database failed");
         for argument in std::env::args() {
@@ -120,9 +92,6 @@ pub async fn start_app() {
     if port == 0 {
         port = settings.port;
     }
-
-    let (sender, recv) = tokio::sync::oneshot::channel::<()>();
-    tokio::spawn(crate::flow::rt::context::clean_expired_session(recv));
 
     let r: Router = gen_router();
     let app = r.fallback(fallback);
@@ -188,7 +157,7 @@ pub async fn start_app() {
     );
     log::info!("---------------------------------------------");
     log::info!("Current version: {VERSION}");
-    log::info!("Visiting https://dialogflowai.github.io/ for the latest releases");
+    log::info!("Visiting https://poweragentai.github.io/ for the latest releases");
 
     log::info!("-->  To close the server, hit {}", "Ctrl+C".bright_red());
 
@@ -198,7 +167,7 @@ pub async fn start_app() {
     let serve = axum::serve(listener, app);
     // log::info!("{:?}", serve.local_addr().unwrap());
     serve
-        .with_graceful_shutdown(shutdown_signal(sender))
+        // .with_graceful_shutdown(shutdown_signal(sender))
         .await
         .unwrap();
 }
@@ -206,94 +175,9 @@ pub async fn start_app() {
 fn gen_router() -> Router {
     Router::new()
         .route(
-            "/robot",
-            get(robot::list).post(robot::save).delete(robot::delete),
+            "/workflow",
+            get(workflow::list).post(workflow::save).delete(workflow::delete),
         )
-        .route("/robot/detail", get(robot::detail))
-        .route(
-            "/intent",
-            get(intent::list).post(intent::add).delete(intent::remove),
-        )
-        .route("/intent/detect", post(intent::detect))
-        .route("/intent/detail", get(intent::detail))
-        .route(
-            "/intent/keyword",
-            post(intent::add_keyword).delete(intent::remove_keyword),
-        )
-        .route(
-            "/intent/regex",
-            post(intent::add_regex).delete(intent::remove_regex),
-        )
-        .route(
-            "/intent/phrase",
-            post(intent::add_phrase).delete(intent::remove_phrase),
-        )
-        .route(
-            "/intent/phrase/regenerate-all",
-            get(intent::regenerate_embeddings),
-        )
-        .route(
-            "/variable",
-            get(variable::list)
-                .post(variable::add)
-                .delete(variable::delete),
-        )
-        .route(
-            "/mainflow",
-            get(mainflow::list)
-                .post(mainflow::new)
-                .put(mainflow::save)
-                .delete(mainflow::delete),
-        )
-        .route("/mainflow/release", get(subflow::release))
-        .route(
-            "/subflow",
-            get(subflow::list)
-                .post(subflow::save)
-                .delete(subflow::delete),
-        )
-        .route("/subflow/simple", get(subflow::simple_list))
-        .route("/subflow/new", post(subflow::new))
-        .route("/external/http", get(http::list))
-        .route(
-            "/external/http/{id}",
-            get(http::detail).post(http::save).delete(http::remove),
-        )
-        .route(
-            "/management/global-settings",
-            get(settings::rest_get_global_settings).post(settings::rest_save_global_settings),
-        )
-        .route(
-            "/management/settings",
-            get(settings::get).post(settings::save),
-        )
-        .route(
-            "/management/settings/model/download",
-            post(settings::download_model_files),
-        )
-        .route(
-            "/management/settings/model/download/progress",
-            get(settings::download_model_progress),
-        )
-        .route(
-            "/management/settings/model/check/files",
-            post(settings::check_model_files),
-        )
-        .route(
-            "/management/settings/model/check/embedding",
-            get(settings::check_embedding_model),
-        )
-        .route(
-            "/kb/qa",
-            get(kb::list_qa).post(kb::save_qa).delete(kb::delete_qa),
-        )
-        .route("/kb/doc", get(kb::list_doc))
-        .route("/kb/qa/dryrun", get(kb::qa_dryrun))
-        .route("/kb/doc/upload", post(kb::upload_doc))
-        .route("/management/settings/smtp/test", post(settings::smtp_test))
-        .route("/flow/answer", post(rt::answer))
-        .route("/flow/answer/sse", post(rt::answer_sse))
-        .route("/ai/text/generation", post(ai::gen_text))
         .route("/version.json", get(version))
         .route("/check-new-version.json", get(check_new_version))
         // .route("/o", get(subflow::output))

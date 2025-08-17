@@ -34,6 +34,8 @@ export default {
             month: 'Month',
             dayOfWeek: 'Day Of Week',
             timezoneOffsetMinutes: 'Timezone',
+            output: 'Output',
+            outputTriggerTimeVarName: 'Trigger time',
         },
         nextStep: 'Next step',
         errors: ['Node name not filled in', 'Text not filled in', 'Text was too long'],
