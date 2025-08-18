@@ -16,7 +16,7 @@ const TABLE_FILE_NAME: &str = "workflow.db";
 macro_rules! db_executor (
     ($func: expr, $prefix: expr, $suffix: expr, $($bind: expr),*) => ({
         let table_name = format!("{}{}", $prefix, $suffix);
-        let table: TableDefinition<&str, &[u8]> = TableDefinition::new(&table_name);
+        let table: redb::TableDefinition<&str, &[u8]> = redb::TableDefinition::new(&table_name);
         $func(table $(,($bind))*)
     });
 );
@@ -49,7 +49,7 @@ pub(crate) async fn init() -> Result<GlobalSettings> {
     }
     let settings = setting::init_global_settings()?;
 
-    context::init()?;
+    // context::init()?;
     Ok(settings)
 }
 

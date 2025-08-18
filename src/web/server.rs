@@ -13,8 +13,10 @@ use serde::{Deserialize, Serialize};
 use tower_http::cors::{AllowOrigin, CorsLayer};
 use tower_http::limit::RequestBodyLimitLayer;
 
-use super::asset::ASSETS_MAP;
+use crate::man::setting;
+use crate::util::Error;
 use crate::workflow::editor as workflow;
+use super::asset::ASSETS_MAP;
 
 //https://stackoverflow.com/questions/27840394/how-can-a-rust-program-access-metadata-from-its-cargo-package
 pub(crate) const VERSION: &str = env!("CARGO_PKG_VERSION");
@@ -54,8 +56,8 @@ pub async fn start_app() {
         let mut s = crate::db::init().await.expect("Initialize database failed");
         for argument in std::env::args() {
             if argument.eq("-rs") {
-                s = settings::GlobalSettings::default();
-                settings::save_global_settings(&s).expect("Reset settings failed");
+                s = setting::GlobalSettings::default();
+                setting::save_global_settings(&s).expect("Reset settings failed");
                 break;
             }
         }
@@ -246,10 +248,10 @@ async fn version() -> impl IntoResponse {
 async fn check_new_version() -> impl IntoResponse {
     let r = reqwest::get("https://dialogflowai.github.io/check-new-version.json").await;
     if let Err(e) = r {
-        return to_res(Err(Error::NetworkConnectTimeout(Box::new(e))));
+        return to_res(Err(Error::WithMessage(e.to_string())));
     }
     r.unwrap().text().await.map_or_else(
-        |e| to_res(Err(Error::NetworkReadTimeout(Box::new(e)))),
+        |e| to_res(Err(Error::WithMessage(e.to_string()))),
         |s| {
             #[derive(Debug, Deserialize, Serialize)]
             struct VersionInfo {
@@ -258,7 +260,7 @@ async fn check_new_version() -> impl IntoResponse {
             }
             let obj: core::result::Result<VersionInfo, _> = serde_json::from_str(&s);
             if let Err(e) = obj {
-                return to_res(Err(Error::InvalidJsonStructure(Box::new(e))));
+                return to_res(Err(Error::WithMessage(e.to_string())));
             }
             let v = obj.unwrap();
             if convert_version(&v.version) > *VERSION_NUM {
@@ -298,10 +300,6 @@ async fn shutdown_signal(sender: tokio::sync::oneshot::Sender<()>) {
         Err(_) => log::info!("中断 ctx 失败"),
     };
 
-    crate::intent::phrase::shutdown_db().await;
-    crate::kb::qa::shutdown_db().await;
-    crate::kb::doc::shutdown_db().await;
-
     let m = if *IS_EN {
         "This program has been terminated"
     } else {
@@ -317,67 +315,67 @@ struct ResponseData<D> {
     pub(crate) err: Option<Error>,
 }
 
-pub(crate) fn to_res2<D>(
-    r: Result<
-        (
-            D,
-            Option<tokio::sync::mpsc::Receiver<crate::flow::rt::dto::StreamingResponseData>>,
-        ),
-        Error,
-    >,
-) -> axum::response::Response
-where
-    D: serde::Serialize + 'static + std::marker::Send,
-{
-    match r {
-        Ok((d, receiver)) => {
-            let builder = Response::builder().status(200);
-            if receiver.is_none() {
-                let res = ResponseData {
-                    status: StatusCode::OK.as_u16(),
-                    data: Some(d),
-                    err: None,
-                };
-                let body = axum::body::Body::from(serde_json::to_string(&res).unwrap());
-                builder
-                    .header(header::CONTENT_TYPE, "application/json")
-                    .body(body)
-                    .unwrap()
-            } else {
-                // log::info!("Response is chunked");
-                let s = tokio_stream::wrappers::ReceiverStream::new(receiver.unwrap());
-                let body = axum::body::Body::from_stream(s.map(|d| {
-                    // let r = crate::flow::rt::dto::ResponseData::new_with_plain_text_answer(d);
-                    // let res = ResponseData {
-                    //     status: StatusCode::OK.as_u16(),
-                    //     data: Some(r),
-                    //     err: None,
-                    // };
-                    let body = serde_json::to_string(&d).unwrap();
-                    Ok::<_, std::convert::Infallible>(body)
-                }));
-                builder
-                    .header(header::TRANSFER_ENCODING, "chunked")
-                    .header(header::CONTENT_TYPE, "application/x-ndjson")
-                    .body(body)
-                    .unwrap()
-            }
-        }
-        Err(e) => {
-            let builder = Response::builder().status(200);
-            let res: ResponseData<D> = ResponseData {
-                status: StatusCode::INTERNAL_SERVER_ERROR.as_u16(),
-                data: None,
-                err: Some(e),
-            };
-            let body = axum::body::Body::from(serde_json::to_string(&res).unwrap());
-            builder
-                .header(header::CONTENT_TYPE, "application/json")
-                .body(body)
-                .unwrap()
-        }
-    }
-}
+// pub(crate) fn to_res2<D>(
+//     r: Result<
+//         (
+//             D,
+//             Option<tokio::sync::mpsc::Receiver<crate::flow::rt::dto::StreamingResponseData>>,
+//         ),
+//         Error,
+//     >,
+// ) -> axum::response::Response
+// where
+//     D: serde::Serialize + 'static + std::marker::Send,
+// {
+//     match r {
+//         Ok((d, receiver)) => {
+//             let builder = Response::builder().status(200);
+//             if receiver.is_none() {
+//                 let res = ResponseData {
+//                     status: StatusCode::OK.as_u16(),
+//                     data: Some(d),
+//                     err: None,
+//                 };
+//                 let body = axum::body::Body::from(serde_json::to_string(&res).unwrap());
+//                 builder
+//                     .header(header::CONTENT_TYPE, "application/json")
+//                     .body(body)
+//                     .unwrap()
+//             } else {
+//                 // log::info!("Response is chunked");
+//                 let s = tokio_stream::wrappers::ReceiverStream::new(receiver.unwrap());
+//                 let body = axum::body::Body::from_stream(s.map(|d| {
+//                     // let r = crate::flow::rt::dto::ResponseData::new_with_plain_text_answer(d);
+//                     // let res = ResponseData {
+//                     //     status: StatusCode::OK.as_u16(),
+//                     //     data: Some(r),
+//                     //     err: None,
+//                     // };
+//                     let body = serde_json::to_string(&d).unwrap();
+//                     Ok::<_, std::convert::Infallible>(body)
+//                 }));
+//                 builder
+//                     .header(header::TRANSFER_ENCODING, "chunked")
+//                     .header(header::CONTENT_TYPE, "application/x-ndjson")
+//                     .body(body)
+//                     .unwrap()
+//             }
+//         }
+//         Err(e) => {
+//             let builder = Response::builder().status(200);
+//             let res: ResponseData<D> = ResponseData {
+//                 status: StatusCode::INTERNAL_SERVER_ERROR.as_u16(),
+//                 data: None,
+//                 err: Some(e),
+//             };
+//             let body = axum::body::Body::from(serde_json::to_string(&res).unwrap());
+//             builder
+//                 .header(header::CONTENT_TYPE, "application/json")
+//                 .body(body)
+//                 .unwrap()
+//         }
+//     }
+// }
 
 // pub(crate) enum ResponseDataHolder<D> {
 //     Normal(D),

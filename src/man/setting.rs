@@ -1,7 +1,9 @@
+use std::net::SocketAddr;
+
 use serde::{Deserialize, Serialize};
 
 use crate::db;
-use crate::util::Result;
+use crate::util::{Error, Result};
 
 use crate::web::server;
 
@@ -9,6 +11,8 @@ use crate::web::server;
 pub(crate) struct GlobalSettings {
     pub(crate) ip: String,
     pub(crate) port: u16,
+    #[serde(rename = "selectRandomPortWhenConflict")]
+    pub(crate) select_random_port_when_conflict: bool,
 }
 
 impl Default for GlobalSettings {
@@ -16,6 +20,7 @@ impl Default for GlobalSettings {
         GlobalSettings {
             ip: String::from("127.0.0.1"),
             port: 12715,
+            select_random_port_when_conflict: true,
         }
     }
 }
@@ -43,4 +48,13 @@ pub(crate) fn init_global_settings() -> Result<GlobalSettings> {
 
 pub(crate) fn get_global_settings() -> Result<Option<GlobalSettings>> {
     db::query(TABLE, GLOBAL_SETTINGS_KEY)
+}
+
+pub(crate) fn save_global_settings(data: &GlobalSettings) -> Result<()> {
+    let addr = format!("{}:{}", data.ip, data.port);
+    let _: SocketAddr = addr.parse().map_err(|_| {
+        log::error!("Saving invalid listen IP: {}", &addr);
+        Error::WithMessage(String::from("lang.settings.invalidIp"))
+    })?;
+    db::write(TABLE, GLOBAL_SETTINGS_KEY, &data)
 }

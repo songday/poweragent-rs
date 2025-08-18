@@ -1,8 +1,10 @@
 use std::convert::From;
 
+use serde::Serialize;
+
 pub(crate) type Result<D> = core::result::Result<D, Error>;
 
-#[derive(Debug)]
+#[derive(Debug, Serialize)]
 pub(crate) enum Error {
     WithMessage(String),
 }
