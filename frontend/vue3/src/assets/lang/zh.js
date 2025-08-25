@@ -1,0 +1,56 @@
+// https://vue-i18n.intlify.dev/guide/essentials/syntax.html#html-message
+export default {
+    common: {
+        add: '新增',
+        back: '返回',
+        save: '保存',
+        saved: '保存成功',
+        cancel: '取消',
+        create: '创建',
+        edit: '编辑',
+        changeName: '修改名称',
+        del: '删除',
+        deleted: '删除成功',
+        insert: '插入',
+        nodeName: '节点名称',
+        else: '否则',
+        successTip: '成功提示',
+        errTip: '错误提示',
+        toDetail: '查看详情',
+        name: '名称',
+        desc: '描述',
+        type: '类型',
+        sec: ' 秒',
+        millis: ' 毫秒',
+        successful: '成功',
+        failed: '失败',
+    },
+    cronJobNode: {
+        nodeName: '定时触发器节点',
+        settings: {
+            sec: '秒',
+            min: '分钟',
+            hour: '小时',
+            dayOfMonth: '日期',
+            month: '月份',
+            dayOfWeek: '星期',
+            timezoneOffsetMinutes: '时区',
+            output: '输出',
+            outputTriggerTimeVarName: '触发时间',
+        },
+        nextStep: '下一步',
+        errors: ['节点名称不能为空', '表达式不能为空', '表达式长度不能超过255'],
+    },
+    httpReqNode: {
+        nodeName: 'HTTP 请求节点',
+        desc: '描述',
+        dynamicTitle: {
+            h: '增加请求头',
+            q: '增加请求参数',
+            f: '增加提交参数',
+        }
+    },
+    llmNode: {
+        nodeName: '大模型节点',
+    },
+}
