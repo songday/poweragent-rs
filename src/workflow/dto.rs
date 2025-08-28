@@ -58,10 +58,30 @@ pub(crate) struct Branch {
 }
 
 #[derive(Deserialize)]
-pub(crate) struct CronJobNode {}
+pub(crate) struct CronJobNode {
+    pub(crate) sec: String,
+    pub(crate) min: String,
+    pub(crate) hour: String,
+    #[serde(rename = "dayOfMonth")]
+    pub(crate) day_of_month: String,
+    pub(crate) month: String,
+    #[serde(rename = "dayOfWeek")]
+    pub(crate) day_of_week: String,
+    #[serde(rename = "timezoneOffsetMin")]
+    pub(crate) timezone_offset_min: String,
+    #[serde(rename = "triggerTimestampVarName")]
+    pub(crate) trigger_timestamp_var_name: String,
+}
 
 #[derive(Deserialize)]
-pub(crate) struct HttpReqNode {}
+pub(crate) struct HttpReqNode {
+    #[serde(rename = "reqInfo")]
+    pub(crate) req_info: crate::util::http::HttpReqInfo,
+    #[serde(rename = "statusCodeVarName")]
+    pub(crate) status_code_var_name: String,
+    #[serde(rename = "responseBodyVarName")]
+    pub(crate) response_body_var_name: String,
+}
 
 #[derive(Deserialize)]
 pub(crate) struct LlmNode {}

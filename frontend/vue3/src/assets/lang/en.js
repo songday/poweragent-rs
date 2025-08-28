@@ -2,6 +2,7 @@ export default {
     common: {
         add: 'Add',
         back: 'Back',
+        close: 'Close',
         save: 'Save',
         saved: 'Successfully saved',
         create: 'Create',

@@ -17,19 +17,22 @@ let originAsyncReqSetting = false;
 const nodeData = reactive({
     nodeName: t('httpReqNode.nodeName'),
     description: '',
-    protocol: 'http://',
-    method: 'GET',
-    address: '',
-    timeoutMilliseconds: 1500,
-    postContentType: 'UrlEncoded',
-    headers: [],
-    queryParams: [],
-    formData: [],
-    requestBody: '',
-    userAgent: 'Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:109.0) Gecko/20100101 Firefox/123.0',
-    asyncReq: false,
+    reqInfo: {
+        protocol: 'http://',
+        method: 'GET',
+        address: '',
+        timeoutMilliseconds: 1500,
+        postContentType: 'UrlEncoded',
+        headers: [],
+        queryParams: [],
+        formData: [],
+        requestBody: '',
+        userAgent: 'Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:109.0) Gecko/20100101 Firefox/123.0',
+        asyncReq: false,
+    },
+    statusCodeVarName: 'statusCode',
+    responseBodyVarName: 'responseBody',
     branches: [],
-    resultVarName: 'httpResponse',
     valid: false,
     invalidMessages: [],
     newNode: true,
@@ -71,11 +74,11 @@ const hideForm = () => {
     nodeSetFormVisible.value = false;
 }
 const addBranches = () => {
-    if (originAsyncReqSetting == nodeData.asyncReq)
+    if (originAsyncReqSetting == nodeData.reqInfo.asyncReq)
         return;
     node.removePorts();
     nodeData.branches = [];
-    if (nodeData.asyncReq) {
+    if (nodeData.reqInfo.asyncReq) {
         node.addPort({
             group: 'absolute',
             args: { x: nodeName.value.offsetWidth - 15, y: nodeName.value.offsetHeight + 50 },
@@ -159,57 +162,38 @@ const addParam = () => {
     const idx = editIdx.value;
     if (idx > -1) {
         if (activeName.value == 'h')
-            nodeData.headers[idx] = p;
+            nodeData.reqInfo.headers[idx] = p;
         else if (activeName.value == 'q')
-            nodeData.queryParams[idx] = p;
+            nodeData.reqInfo.queryParams[idx] = p;
         else if (activeName.value == 'f')
-            nodeData.formData[idx] = p;
+            nodeData.reqInfo.formData[idx] = p;
     } else {
         if (activeName.value == 'h')
-            nodeData.headers.push(p);
+            nodeData.reqInfo.headers.push(p);
         else if (activeName.value == 'q')
-            nodeData.queryParams.push(p);
+            nodeData.reqInfo.queryParams.push(p);
         else if (activeName.value == 'f')
-            nodeData.formData.push(p);
+            nodeData.reqInfo.formData.push(p);
     }
     paramSetFormVisible.value = false
 }
 const editParam = (idx) => {
     editIdx.value = idx;
     if (activeName.value == 'h')
-        copyProperties(nodeData.headers[idx], param)
+        copyProperties(nodeData.reqInfo.headers[idx], param)
     else if (activeName.value == 'q')
-        copyProperties(nodeData.queryParams[idx], param)
+        copyProperties(nodeData.reqInfo.queryParams[idx], param)
     else if (activeName.value == 'f')
-        copyProperties(nodeData.formData[idx], param)
+        copyProperties(nodeData.reqInfo.formData[idx], param)
     paramSetFormVisible.value = true
 }
 const delParam = (idx) => {
     if (activeName.value == 'h')
-        nodeData.headers[idx].splice(idx, 1)
+        nodeData.reqInfo.headers[idx].splice(idx, 1)
     else if (activeName.value == 'q')
-        nodeData.queryParams[idx].splice(idx, 1)
+        nodeData.reqInfo.queryParams[idx].splice(idx, 1)
     else if (activeName.value == 'f')
-        nodeData.formData[idx].splice(idx, 1)
-}
-const save = async () => {
-    nodeData.protocol = nodeData.protocol.replace('://', '').toUpperCase();
-    const t = await httpReq('POST', 'external/http/' + apiId, { robotId: robotId }, null, nodeData);
-    // console.log(t);
-    if (t && t.status == 200) {
-        ElMessage({
-            showClose: true,
-            message: 'All data has been saved.',
-            type: 'success',
-        });
-        goBack();
-    } else {
-        ElMessage({
-            showClose: true,
-            message: 'Oops, this is something wrong.',
-            type: 'error',
-        })
-    }
+        nodeData.reqInfo.formData[idx].splice(idx, 1)
 }
 const insertVar = () => {
     // console.log(requestBodyRef)
@@ -217,7 +201,7 @@ const insertVar = () => {
     // let cursorPosition = requestBodyRef.value.selectionStart
     // console.log(cursorPosition)
     // console.log(requestBodyRef.selectionStart)
-    nodeData.requestBody += '`' + selectedVar.value + '`'
+    nodeData.reqInfo.requestBody += '`' + selectedVar.value + '`'
     // console.log(requestBodyRef.requestBody)
     varDialogVisible.value = false
 }
@@ -272,27 +256,27 @@ const changeTab = (v) => {
                     <el-input v-model="nodeData.description" maxlength="256" show-word-limit type="textarea" />
                 </el-form-item>
                 <el-form-item label="Method">
-                    <el-select v-model="nodeData.method" placeholder="" @change="changeTab">
+                    <el-select v-model="nodeData.reqInfo.method" placeholder="" @change="changeTab">
                         <el-option label="GET" value="GET" />
                         <el-option label="POST" value="POST" />
                     </el-select>
                 </el-form-item>
                 <el-form-item label="Protocol">
-                    <el-select v-model="nodeData.protocol" placeholder="">
+                    <el-select v-model="nodeData.reqInfo.protocol" placeholder="">
                         <el-option label="HTTP" value="http://" />
                         <el-option label="HTTPS" value="https://" />
                     </el-select>
                 </el-form-item>
                 <el-form-item label="Address">
-                    <el-input v-model="nodeData.address">
+                    <el-input v-model="nodeData.reqInfo.address">
                         <!-- <template #prepend>POST Http://</template> -->
-                        <template #prepend>{{ nodeData.method }} {{ nodeData.protocol }}</template>
+                        <template #prepend>{{ nodeData.reqInfo.method }} {{ nodeData.reqInfo.protocol }}</template>
                     </el-input>
                 </el-form-item>
                 <el-form-item label="Parameters">
                     <el-tabs v-model="activeName" class="demo-tabs" @tab-click="handleClick">
                         <el-tab-pane label="Header" name="h">
-                            <el-table :data="nodeData.headers" stripe style="width: 100%">
+                            <el-table :data="nodeData.reqInfo.headers" stripe style="width: 100%">
                                 <el-table-column prop="name" label="Parameter name" width="300" />
                                 <el-table-column prop="value" label="Parameter value" width="200" />
                                 <el-table-column fixed="right" :label="tm('mainflow.table')[2]" width="270">
@@ -310,7 +294,7 @@ const changeTab = (v) => {
                             <el-button type="warning" @click="newParam">+Add header</el-button>
                         </el-tab-pane>
                         <el-tab-pane label="Query parameters" name="q">
-                            <el-table :data="nodeData.queryParams" stripe style="width: 100%">
+                            <el-table :data="nodeData.reqInfo.queryParams" stripe style="width: 100%">
                                 <el-table-column prop="name" label="Parameter name" width="300" />
                                 <el-table-column prop="value" label="Parameter value" width="200" />
                                 <el-table-column fixed="right" :label="tm('mainflow.table')[2]" width="270">
@@ -327,14 +311,14 @@ const changeTab = (v) => {
                             </el-table>
                             <el-button type="warning" @click="newParam">+Add query parameter</el-button>
                         </el-tab-pane>
-                        <el-tab-pane label="Request body" name="f" v-if="nodeData.method == 'POST'">
+                        <el-tab-pane label="Request body" name="f" v-if="nodeData.reqInfo.method == 'POST'">
                             Request body type:
-                            <el-radio-group v-model="nodeData.postContentType" class="ml-4">
+                            <el-radio-group v-model="nodeData.reqInfo.postContentType" class="ml-4">
                                 <el-radio value="UrlEncoded" size="large">application/x-www-form-urlencoded</el-radio>
                                 <el-radio value="JSON" size="large">JSON</el-radio>
                                 <!-- <el-radio value="1" size="large">multipart/form-data</el-radio> -->
                             </el-radio-group>
-                            <el-table v-if="nodeData.postContentType == 'UrlEncoded'" :data="nodeData.formData" stripe
+                            <el-table v-if="nodeData.reqInfo.postContentType == 'UrlEncoded'" :data="nodeData.reqInfo.formData" stripe
                                 style="width: 100%">
                                 <el-table-column prop="name" label="Parameter name" width="300" />
                                 <el-table-column prop="value" label="Parameter value" width="200" />
@@ -350,14 +334,14 @@ const changeTab = (v) => {
                                     </template>
                                 </el-table-column>
                             </el-table>
-                            <el-button type="warning" v-if="nodeData.postContentType == 'UrlEncoded'"
+                            <el-button type="warning" v-if="nodeData.reqInfo.postContentType == 'UrlEncoded'"
                                 @click="newParam">+Add form
                                 data</el-button>
                             <!-- <div style="margin: 20px 0" /> -->
-                            <el-input ref="requestBodyRef" v-if="nodeData.postContentType == 'JSON'"
-                                v-model="nodeData.requestBody" maxlength="10240" placeholder="JSON" show-word-limit
+                            <el-input ref="requestBodyRef" v-if="nodeData.reqInfo.postContentType == 'JSON'"
+                                v-model="nodeData.reqInfo.requestBody" maxlength="10240" placeholder="JSON" show-word-limit
                                 type="textarea" />
-                            <el-button type="warning" v-if="nodeData.postContentType == 'JSON'"
+                            <el-button type="warning" v-if="nodeData.reqInfo.postContentType == 'JSON'"
                                 @click="varDialogVisible = true">+Insert
                                 a
                                 variable</el-button>
@@ -365,24 +349,26 @@ const changeTab = (v) => {
                     </el-tabs>
                 </el-form-item>
                 <el-form-item label="User agent">
-                    <el-input v-model="nodeData.userAgent" />
+                    <el-input v-model="nodeData.reqInfo.userAgent" />
                 </el-form-item>
                 <el-form-item label="Sync/Async" :label-width="formLabelWidth">
                     <!-- <el-switch v-model="httpApiData.asyncReq" class="mb-2" active-text="Asynchronous" inactive-text="Synchronous" /> -->
                     <!-- <input type="checkbox" id="_asyncReq_" v-model="nodeData.asyncReq"
                         :checked="nodeData.asyncReq" /><label for="_asyncReq_">Asynchronous</label> -->
-                    <el-checkbox v-model="nodeData.asyncReq" label="Asynchronous" />
+                    <el-checkbox v-model="nodeData.reqInfo.asyncReq" label="Asynchronous" />
                 </el-form-item>
                 <el-form-item label="Timeout" :label-width="formLabelWidth">
-                    <el-input-number v-model="nodeData.timeoutMilliseconds" :min="200" :max="600000" />
+                    <el-input-number v-model="nodeData.reqInfo.timeoutMilliseconds" :min="200" :max="600000" />
                     {{ $t('common.millis') }}
                 </el-form-item>
-                <el-form-item v-show="!nodeData.asyncReq" label="Save response to" :label-width="formLabelWidth">
-                    <el-input v-model="nodeData.resultVarName" autocomplete="on" placeholder="Enter a variable name" />
+                <el-form-item v-show="!nodeData.reqInfo.asyncReq" label="Save status code to" :label-width="formLabelWidth">
+                    <el-input v-model="nodeData.statusCodeVarName" autocomplete="on" placeholder="Enter a variable name" />
+                </el-form-item>
+                <el-form-item v-show="!nodeData.reqInfo.asyncReq" label="Save response to" :label-width="formLabelWidth">
+                    <el-input v-model="nodeData.responseBodyVarName" autocomplete="on" placeholder="Enter a variable name" />
                 </el-form-item>
                 <el-form-item>
-                    <el-button type="primary" @click="saveForm">{{ $t('common.save') }}</el-button>
-                    <el-button @click="hideForm">{{ $t('common.cancel') }}</el-button>
+                    <el-button type="primary" @click="nodeSetFormVisible = false">{{ $t('common.close') }}</el-button>
                 </el-form-item>
             </el-form>
         </el-drawer>
