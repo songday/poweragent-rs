@@ -4,6 +4,7 @@ import { useI18n } from 'vue-i18n'
 import EpWarning from '~icons/ep/warning'
 import { copyProperties, getDefaultBranch, httpReq } from '@/assets/tools.js'
 const getNode = inject('getNode');
+const allVarNames = inject('allVarNames', new Set());
 const { t, tm, rt } = useI18n();
 const node = getNode();
 node.on("change:data", ({ current }) => {
@@ -64,6 +65,8 @@ const validate = () => {
     nodeData.valid = m.length == 0;
 }
 const saveForm = () => {
+    allVarNames.add(nodeData.statusCodeVarName);
+    allVarNames.add(nodeData.responseBodyVarName);
     addBranches();
     validate();
     node.removeData({ silent: true });
@@ -318,8 +321,8 @@ const changeTab = (v) => {
                                 <el-radio value="JSON" size="large">JSON</el-radio>
                                 <!-- <el-radio value="1" size="large">multipart/form-data</el-radio> -->
                             </el-radio-group>
-                            <el-table v-if="nodeData.reqInfo.postContentType == 'UrlEncoded'" :data="nodeData.reqInfo.formData" stripe
-                                style="width: 100%">
+                            <el-table v-if="nodeData.reqInfo.postContentType == 'UrlEncoded'"
+                                :data="nodeData.reqInfo.formData" stripe style="width: 100%">
                                 <el-table-column prop="name" label="Parameter name" width="300" />
                                 <el-table-column prop="value" label="Parameter value" width="200" />
                                 <el-table-column fixed="right" :label="tm('mainflow.table')[2]" width="270">
@@ -335,12 +338,13 @@ const changeTab = (v) => {
                                 </el-table-column>
                             </el-table>
                             <el-button type="warning" v-if="nodeData.reqInfo.postContentType == 'UrlEncoded'"
-                                @click="newParam">+Add form
+                                @click="newParam">+Add
+                                form
                                 data</el-button>
                             <!-- <div style="margin: 20px 0" /> -->
                             <el-input ref="requestBodyRef" v-if="nodeData.reqInfo.postContentType == 'JSON'"
-                                v-model="nodeData.reqInfo.requestBody" maxlength="10240" placeholder="JSON" show-word-limit
-                                type="textarea" />
+                                v-model="nodeData.reqInfo.requestBody" maxlength="10240" placeholder="JSON"
+                                show-word-limit type="textarea" />
                             <el-button type="warning" v-if="nodeData.reqInfo.postContentType == 'JSON'"
                                 @click="varDialogVisible = true">+Insert
                                 a
@@ -361,16 +365,21 @@ const changeTab = (v) => {
                     <el-input-number v-model="nodeData.reqInfo.timeoutMilliseconds" :min="200" :max="600000" />
                     {{ $t('common.millis') }}
                 </el-form-item>
-                <el-form-item v-show="!nodeData.reqInfo.asyncReq" label="Save status code to" :label-width="formLabelWidth">
-                    <el-input v-model="nodeData.statusCodeVarName" autocomplete="on" placeholder="Enter a variable name" />
+                <el-form-item v-show="!nodeData.reqInfo.asyncReq" label="" :label-width="formLabelWidth">
+                    {{ t('common.outputVarNote') }}
                 </el-form-item>
-                <el-form-item v-show="!nodeData.reqInfo.asyncReq" label="Save response to" :label-width="formLabelWidth">
-                    <el-input v-model="nodeData.responseBodyVarName" autocomplete="on" placeholder="Enter a variable name" />
+                <el-form-item v-show="!nodeData.reqInfo.asyncReq" label="Status code" :label-width="formLabelWidth">
+                    <el-input v-model="nodeData.statusCodeVarName" autocomplete="on"
+                        placeholder="Enter a variable name" />
                 </el-form-item>
-                <el-form-item>
-                    <el-button type="primary" @click="nodeSetFormVisible = false">{{ $t('common.close') }}</el-button>
+                <el-form-item v-show="!nodeData.reqInfo.asyncReq" label="Response" :label-width="formLabelWidth">
+                    <el-input v-model="nodeData.responseBodyVarName" autocomplete="on"
+                        placeholder="Enter a variable name" />
                 </el-form-item>
             </el-form>
+            <div>
+                <el-button type="primary" @click="saveForm">{{ $t('common.close') }}</el-button>
+            </div>
         </el-drawer>
         <el-dialog v-model="paramSetFormVisible" width="60%" :append-to-body="true" :destroy-on-close="true">
             <template #header="{ close, titleId, titleClass }">
@@ -392,8 +401,7 @@ const changeTab = (v) => {
                             style="width:400px" />
                         <el-select v-if="param.valueSource == 'Var'" v-model="selectedVar"
                             placeholder="Select a varaible" style="width:400px">
-                            <el-option v-for="item in vars" :key="item.varName" :label="item.varName"
-                                :value="item.varName" />
+                            <el-option v-for="item in allVarNames" :key="item" :label="item" :value="item" />
                         </el-select>
                     </el-space>
                 </el-form-item>
@@ -401,6 +409,19 @@ const changeTab = (v) => {
             <template #footer>
                 <el-button type="primary" @click="addParam">{{ $t('common.save') }}</el-button>
                 <el-button @click="paramSetFormVisible = false">{{ $t('common.cancel') }}</el-button>
+            </template>
+        </el-dialog>
+        <el-dialog v-model="varDialogVisible" title="Insert a variable" width="30%" :append-to-body="true" :destroy-on-close="true">
+            <el-select v-model="selectedVar" class="m-2" placeholder="Choose a variable" size="large">
+                <el-option v-for="item in allVarNames" :key="item" :label="item" :value="item" />
+            </el-select>
+            <template #footer>
+                <span class="dialog-footer">
+                    <el-button type="primary" @click="insertVar">
+                        {{ t('common.insert') }}
+                    </el-button>
+                    <el-button @click="varDialogVisible = false">{{ t('common.cancel') }}</el-button>
+                </span>
             </template>
         </el-dialog>
         <!-- </teleport> -->

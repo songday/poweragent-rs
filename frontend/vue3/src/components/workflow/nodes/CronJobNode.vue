@@ -4,6 +4,7 @@ import EpWarning from '~icons/ep/warning'
 import { copyProperties } from '@/assets/tools'
 import { useI18n } from 'vue-i18n'
 const getNode = inject('getNode');
+const allVarNames = inject('allVarNames', new Set());
 const { t, tm, rt } = useI18n();
 const node = getNode();
 node.on("change:data", ({ current }) => {
@@ -46,7 +47,7 @@ const nodeData = reactive({
     month: '*',
     dayOfWeek: '*',
     timezoneOffsetMin: 0,
-    triggerTimestampVarName: 'TriggerTime',
+    triggerTimestampVarName: 'triggerTime',
     invalidMessages: [],
     newNode: true,
 })
@@ -75,6 +76,7 @@ const validate = () => {
 }
 
 const saveForm = () => {
+    allVarNames.add(nodeData.triggerTimestampVarName);
     hideForm();
     setInfo();
     validate();
@@ -138,7 +140,8 @@ const hideForm = () => { nodeSetFormVisible.value = false }
                 <el-form-item :label="t('cronJobNode.settings.dayOfWeek')" :label-width="formLabelWidth">
                     <el-input v-model="nodeData.dayOfWeek" />
                 </el-form-item>
-                <el-form-item :label="t('cronJobNode.settings.output')" :label-width="formLabelWidth">
+                <el-form-item label="" :label-width="formLabelWidth">
+                    {{ t('common.outputVarNote') }}
                 </el-form-item>
                 <el-form-item :label="t('cronJobNode.settings.outputTriggerTimeVarName')" :label-width="formLabelWidth">
                     <el-input v-model="nodeData.triggerTimestampVarName" />

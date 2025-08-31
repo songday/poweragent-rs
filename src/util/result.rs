@@ -62,3 +62,15 @@ impl From<reqwest::header::InvalidHeaderValue> for Error {
         Error::WithMessage(format!("{err:?}"))
     }
 }
+
+impl From<candle::Error> for Error {
+    fn from(err: candle::Error) -> Self {
+        Error::WithMessage(format!("{err:?}"))
+    }
+}
+
+impl From<std::io::Error> for Error {
+    fn from(err: std::io::Error) -> Self {
+        Error::WithMessage(format!("{err:?}"))
+    }
+}
