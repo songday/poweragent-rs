@@ -3,6 +3,7 @@ export default {
     common: {
         add: '新增',
         back: '返回',
+        close: '关闭',
         save: '保存',
         saved: '保存成功',
         cancel: '取消',
@@ -24,6 +25,7 @@ export default {
         millis: ' 毫秒',
         successful: '成功',
         failed: '失败',
+        outputVarNote: '以下是结果输出变量，变量名称可以修改',
     },
     cronJobNode: {
         nodeName: '定时触发器节点',
@@ -35,7 +37,6 @@ export default {
             month: '月份',
             dayOfWeek: '星期',
             timezoneOffsetMinutes: '时区',
-            output: '输出',
             outputTriggerTimeVarName: '触发时间',
         },
         nextStep: '下一步',

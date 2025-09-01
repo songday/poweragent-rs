@@ -195,6 +195,9 @@ onUnmounted(
     }
 );
 
+const allVarNames = new Set();
+provide('allVarNames', allVarNames);
+
 function addHandleNode(x, y, item) {
     // console.log('addHandleNode' + x);
     const node = graph.addNode({

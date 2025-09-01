@@ -2,6 +2,7 @@ export default {
     common: {
         add: 'Add',
         back: 'Back',
+        close: 'Close',
         save: 'Save',
         saved: 'Successfully saved',
         create: 'Create',
@@ -23,6 +24,7 @@ export default {
         millis: 'milliseconds',
         successful: 'Successful',
         failed: 'Failed',
+        outputVarNote: 'The following is the result output variable, the variable name can be modified',
     },
     cronJobNode: {
         nodeName: 'Cron job node',
@@ -34,7 +36,6 @@ export default {
             month: 'Month',
             dayOfWeek: 'Day Of Week',
             timezoneOffsetMinutes: 'Timezone',
-            output: 'Output',
             outputTriggerTimeVarName: 'Trigger time',
         },
         nextStep: 'Next step',

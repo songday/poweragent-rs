@@ -4,6 +4,8 @@ import { copyProperties, httpReq, getDefaultBranch } from '@/assets/tools.js'
 import { useI18n } from 'vue-i18n'
 import EpWarning from '~icons/ep/warning'
 const { t, tm, rt } = useI18n();
+const allVarNames = inject('allVarNames', new Set());
+const getNode = inject('getNode');
 const nodeData = reactive({
     nodeName: t('llmNode.nodeName'),
     modelCategory: 'LlmApis',
@@ -19,10 +21,10 @@ const nodeData = reactive({
     invalidMessages: [],
     branches: [],
     asyncReq: false,
-    resultVarName: 'llmResponse',
+    responseVarName: 'llmResponse',
+    executionTimeMillisVarName: 'llmExecutionTimeMillis',
     newNode: true,
 });
-const getNode = inject('getNode');
 // const { ollamaModels } = inject('ollamaModels');
 const nodeSetFormVisible = ref(false)
 const nodeName = ref()
@@ -157,6 +159,8 @@ const validate = () => {
     d.valid = m.length == 0;
 }
 
+const updateBrief = () => {}
+
 const saveForm = () => {
     const node = getNode();
     const ports = node.getPorts();
@@ -166,31 +170,13 @@ const saveForm = () => {
     branch.branchType = 'GotoAnotherNode';
     nodeData.branches.splice(0, nodeData.branches.length, branch);
     validate()
-    delete nodeData.exitCondition;
-    nodeData.exitCondition = {};
-    const nodeExitType = nodeData.nodeExitType.replace(/exitBy/, '');
-    if (nodeExitType == 'Intent')
-        nodeData.exitCondition[nodeExitType] = nodeData.exitIntent;
-    else if (nodeExitType == 'SpecialInputs')
-        nodeData.exitCondition[nodeExitType] = nodeData.exitSpecialInputs;
-    else if (nodeExitType == 'LlmResultContains')
-        nodeData.exitCondition[nodeExitType] = nodeData.exitLlmResultContains;
-    else if (nodeExitType == 'MaxChatTimes')
-        nodeData.exitCondition[nodeExitType] = nodeData.maxChatTimes;
     nodeData.prompt = JSON.stringify([{ "role": "user", "content": nodeData.promptText },])
-    if (!overrideTimeoutEnabled.value) {
-        nodeData.timeoutMillis = null;
-        nodeData.readTimeout = null;
-    }
-    delete nodeData.whenTimeoutThen;
-    if (whenTimeoutThen.value == 'ResponseAlternateText') {
-        nodeData.whenTimeoutThen = { ResponseAlternateText: responseAlternateText }
-    } else {
-        nodeData.whenTimeoutThen = whenTimeoutThen;
-    }
     console.log('nodeData', nodeData);
     node.removeData({ silent: true });
     node.setData(nodeData, { silent: false });
+    allVarNames.add(nodeData.responseVarName);
+    allVarNames.add(nodeData.executionTimeMillisVarName);
+    console.log('allVarNames', allVarNames)
     updateBrief();
     hideForm();
 }
@@ -287,8 +273,14 @@ const hideForm = () => {
                     :label-width="formLabelWidth">
                     <el-input-number v-model="nodeData.timeoutMillis" :min="100" :max="65500" />
                 </el-form-item>
+                <el-form-item v-show="!nodeData.asyncReq" label="" :label-width="formLabelWidth">
+                    {{ t('common.outputVarNote') }}
+                </el-form-item>
                 <el-form-item v-show="!nodeData.asyncReq" label="Save response to" :label-width="formLabelWidth">
-                    <el-input v-model="nodeData.resultVarName" autocomplete="on" placeholder="Enter a variable name" />
+                    <el-input v-model="nodeData.responseVarName" autocomplete="on" placeholder="Enter a variable name" />
+                </el-form-item>
+                <el-form-item v-show="!nodeData.asyncReq" label="Execution time" :label-width="formLabelWidth">
+                    <el-input v-model="nodeData.executionTimeMillisVarName" autocomplete="on" placeholder="Enter a variable name" />
                 </el-form-item>
             </el-form>
             <div>

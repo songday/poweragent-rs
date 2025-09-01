@@ -4,6 +4,7 @@ import EpWarning from '~icons/ep/warning'
 import { copyProperties } from '@/assets/tools'
 import { useI18n } from 'vue-i18n'
 const getNode = inject('getNode');
+const allVarNames = inject('allVarNames', new Set());
 const { t, tm, rt } = useI18n();
 const node = getNode();
 node.on("change:data", ({ current }) => {
@@ -17,7 +18,7 @@ const nodeSetFormVisible = ref(false)
 onMounted(() => {
     if (nodeData.newNode) {
         nodeData.nodeName += node.getData().nodeCnt.toString();
-        nodeData.timezoneOffsetMinutes = 0 - (new Date()).getTimezoneOffset();
+        nodeData.timezoneOffsetMin = 0 - (new Date()).getTimezoneOffset();
         const heightOffset = nodeName.value.offsetHeight + 60;
         const x = nodeName.value.offsetWidth - 15;
         node.addPort({
@@ -45,8 +46,8 @@ const nodeData = reactive({
     dayOfMonth: '*',
     month: '*',
     dayOfWeek: '*',
-    timezoneOffsetMinutes: 0,
-    outputTriggerTimeVarName: 'TriggerTime',
+    timezoneOffsetMin: 0,
+    triggerTimestampVarName: 'triggerTime',
     invalidMessages: [],
     newNode: true,
 })
@@ -59,7 +60,7 @@ const setInfo = () => {
     a.push(t('cronJobNode.settings.dayOfMonth') + ': ' + nodeData.dayOfMonth);
     a.push(t('cronJobNode.settings.month') + ': ' + nodeData.month);
     a.push(t('cronJobNode.settings.dayOfWeek') + ': ' + nodeData.dayOfWeek);
-    a.push(t('cronJobNode.settings.timezoneOffsetMinutes') + ': UTC' + (nodeData.timezoneOffsetMinutes >= 0 ? '+' : '') + nodeData.timezoneOffsetMinutes);
+    a.push(t('cronJobNode.settings.timezoneOffsetMinutes') + ': UTC' + (nodeData.timezoneOffsetMin >= 0 ? '+' : '') + nodeData.timezoneOffsetMin);
     info.value = a.join(', ')
 }
 
@@ -75,6 +76,7 @@ const validate = () => {
 }
 
 const saveForm = () => {
+    allVarNames.add(nodeData.triggerTimestampVarName);
     hideForm();
     setInfo();
     validate();
@@ -138,10 +140,11 @@ const hideForm = () => { nodeSetFormVisible.value = false }
                 <el-form-item :label="t('cronJobNode.settings.dayOfWeek')" :label-width="formLabelWidth">
                     <el-input v-model="nodeData.dayOfWeek" />
                 </el-form-item>
-                <el-form-item :label="t('cronJobNode.settings.output')" :label-width="formLabelWidth">
+                <el-form-item label="" :label-width="formLabelWidth">
+                    {{ t('common.outputVarNote') }}
                 </el-form-item>
                 <el-form-item :label="t('cronJobNode.settings.outputTriggerTimeVarName')" :label-width="formLabelWidth">
-                    <el-input v-model="nodeData.outputTriggerTimeVarName" />
+                    <el-input v-model="nodeData.triggerTimestampVarName" />
                 </el-form-item>
             </el-form>
             <div class="demo-drawer__footer">
