@@ -2,10 +2,10 @@ use std::collections::HashMap;
 use std::time::Duration;
 use std::vec::Vec;
 
-use serde::{Deserialize, Serialize};
 use reqwest::Client;
 use reqwest::RequestBuilder;
 use reqwest::header::{HeaderMap, HeaderName, HeaderValue};
+use serde::{Deserialize, Serialize};
 
 use super::Result;
 
@@ -171,8 +171,7 @@ fn build_req(
                 ValueSource::Val => queries.push((&p.name, p.value.clone())),
                 ValueSource::Var => queries.push((
                     &p.name,
-                    vars.get(&p.value)
-                        .map_or(String::new(), |v| v.clone()),
+                    vars.get(&p.value).map_or(String::new(), |v| v.clone()),
                 )),
             }
         }

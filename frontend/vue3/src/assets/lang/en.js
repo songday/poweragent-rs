@@ -26,6 +26,11 @@ export default {
         failed: 'Failed',
         outputVarNote: 'The following is the result output variable, the variable name can be modified',
     },
+    workflow:{
+        create:'Create workflow',
+        name:'Workflow name',
+        desc:'Workflow description',
+    },
     cronJobNode: {
         nodeName: 'Cron job node',
         settings: {

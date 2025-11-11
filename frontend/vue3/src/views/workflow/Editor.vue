@@ -1,5 +1,6 @@
 <script setup>
 import { h, ref, onMounted, onUnmounted, nextTick, provide, readonly } from "vue";
+import { useRoute, useRouter } from 'vue-router';
 import BiArrowLeft from '~icons/bi/arrow-left'
 import BiFloppy from '~icons/bi/floppy'
 import BiClipboard2Check from '~icons/bi/clipboard2-check'
@@ -10,6 +11,7 @@ import LlmNode from "@/components/workflow/nodes/LlmNode.vue";
 import { Graph } from '@antv/x6';
 // https://x6.antv.vision/zh/docs/tutorial/advanced/react#%E6%B8%B2%E6%9F%93-vue-%E8%8A%82%E7%82%B9
 import { register, getTeleport } from "@antv/x6-vue-shape";
+const router = useRouter();
 
 register({
     shape: "CronJobNode",
@@ -220,6 +222,10 @@ function dragoverDiv(ev) {
     ev.preventDefault();
 }
 
+const goBack = () => {
+  router.push({ name: 'home' });
+}
+
 const TeleportContainer = getTeleport();
 
 const nodes = [
@@ -273,7 +279,7 @@ const nodes = [
 <template>
     <div class="nodesBox">
         <div>
-            <el-button circle>
+            <el-button circle @click="goBack">
                 <el-icon size="large">
                     <BiArrowLeft />
                 </el-icon>

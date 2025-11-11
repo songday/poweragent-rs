@@ -4,28 +4,28 @@ version = "0.1.0"
 edition = "2024"
 
 [dependencies]
-axum = {version = "0.8.4", features = ["query", "tokio", "macros", "multipart"]}
+axum = {version = "0.8.6", features = ["query", "tokio", "macros", "multipart"]}
 candle = { version = "0.9.1", package = "candle-core", default-features = false }
 candle-nn = "0.9.1"
 candle-transformers = "0.9.1"
-chrono = "0.4.41"
+chrono = "0.4.42"
 colored = "3.0.0"
 env_logger = "0.11.8"
 futures = "0.3.31"
 futures-util = "0.3.31"
-log = "0.4.27"
-redb = "3.0.0"
-reqwest = { version = "0.12.22", default-features = false, features = ["native-tls", "stream"] }
-rkyv = {version = "0.8.10", features = ["aligned", "alloc", "bytecheck"]}
-serde = { version = "1.0.219", features = ["derive"] }
-serde_json = "1.0.142"
-tokenizers = "0.22.0"
-tokio = { version = "1.46.1", features = ["fs", "io-util", "macros", "net", "rt", "rt-multi-thread", "signal", "time"] }
+log = "0.4.28"
+redb = "3.1.0"
+reqwest = { version = "0.12.24", default-features = false, features = ["native-tls", "stream"] }
+rkyv = {version = "0.8.12", features = ["aligned", "alloc", "bytecheck"]}
+scru128 = "3.2.3"
+serde = { version = "1.0.228", features = ["derive"] }
+serde_json = "1.0.145"
+tokenizers = "0.22.1"
+tokio = { version = "1.48.0", features = ["fs", "io-util", "macros", "net", "rt", "rt-multi-thread", "signal", "time"] }
 tower-http = { version = "0.6.6", features = ["cors", "limit"] }
 
 [target.'cfg(windows)'.dependencies]
-windows = {version = "0.61.3", features = ["Win32_Globalization", "Win32_System_SystemServices"]}
+windows = {version = "0.62.2", features = ["Win32_Globalization", "Win32_System_SystemServices"]}
 
 [build-dependencies]
-flate2 = "1.1.2"
-
+flate2 = "1.1.5"

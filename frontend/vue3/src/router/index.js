@@ -18,11 +18,7 @@ const router = createRouter({
       // which is lazy-loaded when the route is visited.
       component: () => import('../views/AboutView.vue'),
     },
-    {
-      path: '/workflow/editor',
-      name: 'editor',
-      component: EditorView,
-    },
+    { path: '/workflow/editor/:workflowId', name: 'workflow', component: EditorView, props: true },
   ],
 })
 

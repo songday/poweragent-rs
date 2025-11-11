@@ -13,7 +13,6 @@ pub(crate) struct Workflow {
     // pub(crate) valid: bool,
 }
 
-
 #[derive(Deserialize)]
 pub(crate) struct CanvasCells {
     pub(crate) cells: Vec<CanvasCell>,
@@ -84,4 +83,31 @@ pub(crate) struct HttpReqNode {
 }
 
 #[derive(Deserialize)]
-pub(crate) struct LlmNode {}
+pub(crate) struct LlmNode {
+    #[serde(rename = "nodeName")]
+    pub(crate) node_name: String,
+    #[serde(rename = "modelCategory")]
+    pub(crate) model_category: String,
+    #[serde(rename = "llmApiProvider")]
+    pub(crate) llm_api_provider: String,
+    #[serde(rename = "modelId")]
+    pub(crate) model_id: String,
+    #[serde(rename = "ollamaApiUrl")]
+    pub(crate) ollama_api_url: String,
+    #[serde(rename = "apiKey")]
+    pub(crate) api_key: String,
+    #[serde(rename = "systemPrompt")]
+    pub(crate) system_prompt: String,
+    #[serde(rename = "userPrompt")]
+    pub(crate) user_prompt: String,
+    #[serde(rename = "contextLength")]
+    pub(crate) context_length: String,
+    #[serde(rename = "timeoutMillis")]
+    pub(crate) timeout_millis: String,
+    #[serde(rename = "asyncReq")]
+    pub(crate) async_req: String,
+    #[serde(rename = "responseVarName")]
+    pub(crate) response_var_name: String,
+    #[serde(rename = "executionTimeMillisVarName")]
+    pub(crate) execution_time_millis_var_name: String,
+}
