@@ -19,8 +19,8 @@ use tokenizers::{AddedToken, PaddingParams, PaddingStrategy, Tokenizer, Truncati
 use tokio::fs::OpenOptions;
 use tokio::io::AsyncWriteExt;
 
-use crate::util::{Error, Result};
 use super::client::Prompt;
+use crate::util::{Error, Result};
 
 #[derive(Clone, Debug, Deserialize, Serialize)]
 pub(crate) enum HuggingFaceModel {
@@ -97,11 +97,7 @@ pub(crate) struct HuggingFaceModelInfo {
 }
 
 impl HuggingFaceModelInfo {
-    pub(super) fn convert_prompt(
-        &self,
-        s: &str,
-        history: Option<Vec<Prompt>>,
-    ) -> Result<String> {
+    pub(super) fn convert_prompt(&self, s: &str, history: Option<Vec<Prompt>>) -> Result<String> {
         let mut system = String::new();
         let mut user = String::new();
         if !s.is_empty() && s.starts_with("[") {

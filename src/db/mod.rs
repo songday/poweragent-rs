@@ -1,6 +1,6 @@
 use std::borrow::Borrow;
-use std::sync::LazyLock;
 use std::path::Path;
+use std::sync::LazyLock;
 
 use redb::ReadableDatabase;
 use redb::ReadableTableMetadata;

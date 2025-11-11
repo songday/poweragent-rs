@@ -13,10 +13,10 @@ use serde::{Deserialize, Serialize};
 use tower_http::cors::{AllowOrigin, CorsLayer};
 use tower_http::limit::RequestBodyLimitLayer;
 
+use super::asset::ASSETS_MAP;
 use crate::man::setting;
 use crate::util::Error;
 use crate::workflow::editor as workflow;
-use super::asset::ASSETS_MAP;
 
 //https://stackoverflow.com/questions/27840394/how-can-a-rust-program-access-metadata-from-its-cargo-package
 pub(crate) const VERSION: &str = env!("CARGO_PKG_VERSION");
@@ -178,7 +178,10 @@ fn gen_router() -> Router {
     Router::new()
         .route(
             "/workflow",
-            get(workflow::list).post(workflow::save).delete(workflow::delete),
+            get(workflow::list)
+                .post(workflow::create)
+                .put(workflow::save)
+                .delete(workflow::delete),
         )
         .route("/version.json", get(version))
         .route("/check-new-version.json", get(check_new_version))
