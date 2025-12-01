@@ -263,6 +263,9 @@ onUnmounted(() => {
 const allVarNames = new Set()
 provide('allVarNames', allVarNames)
 
+const allNodeNameSet = ref(new Set())
+provide('allNodeNameSet', allNodeNameSet)
+
 function addHandleNode(x, y, item) {
   // console.log('addHandleNode' + x);
   const node = graph.addNode({
@@ -272,8 +275,7 @@ function addHandleNode(x, y, item) {
     connectable: item.connectable,
     // tools: ["button-remove"],
   })
-  item.cnt++
-  node.setData({ nodeType: item.type, nodeCnt: item.cnt })
+  node.setData({ nodeType: item.type })
 }
 
 function handleDragEnd(e, item) {
@@ -292,17 +294,16 @@ const goBack = () => {
 const TeleportContainer = getTeleport()
 
 const nodes = [
-  { name: 'Cron job node', type: 'CronJobNode', desc: 'Cron job node', cnt: 0, connectable: false },
+  { name: 'Cron job node', type: 'CronJobNode', desc: 'Cron job node', connectable: false },
   {
     name: 'Http request node',
     type: 'HttpReqNode',
     desc: 'Http request node',
-    cnt: 0,
     connectable: true,
   },
-  { name: 'LLM node', type: 'LlmNode', desc: 'LLM node', cnt: 0, connectable: true },
-  { name: 'Output node', type: 'OutputNode', desc: 'Output node', cnt: 0, connectable: true },
-  { name: 'Script node', type: 'ScriptNode', desc: 'Script node', cnt: 0, connectable: true },
+  { name: 'LLM node', type: 'LlmNode', desc: 'LLM node', connectable: true },
+  { name: 'Output node', type: 'OutputNode', desc: 'Output node', connectable: true },
+  { name: 'Script node', type: 'ScriptNode', desc: 'Script node', connectable: true },
 ]
 </script>
 
